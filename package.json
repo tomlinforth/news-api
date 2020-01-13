@@ -7,7 +7,12 @@
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed": "knex seed:run",
     "test-utils": "mocha spec/utils.spec.js",
-    "test": "mocha spec/app.spec.js"
+    "test": "mocha spec/app.spec.js",
+    "make-migrate": "knex migrate:make",
+    "latest": "knex migrate:latest",
+    "rollback": "knex migrate:rollback",
+    "upOnce": "knex migrate:up",
+    "downOnce": "knex migrate:down"
   },
   "repository": {
     "type": "git",
@@ -20,6 +25,14 @@
     "url": "https://github.com/northcoders/be-nc-news/issues"
   },
   "homepage": "https://github.com/northcoders/be-nc-news#readme",
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "express": "^4.17.1",
+    "knex": "^0.20.7",
+    "pg": "^7.17.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^7.0.0",
+    "supertest": "^4.0.2"
+  }
 }

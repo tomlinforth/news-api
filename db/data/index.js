@@ -7,4 +7,4 @@ const data = {
   test: testData
 };
 
-modeule.exports = data[ENV];
+module.exports = data[ENV];
