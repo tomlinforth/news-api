@@ -518,13 +518,13 @@ describe("/api", () => {
               expect(response.body.msg).to.equal("Invalid query parameter.");
             });
         });
-        it("GET:400 on / when passed an author or topic that doesnt exist in the query", () => {
+        it("GET:404 on / when passed an author or topic that doesnt exist in the query", () => {
           const badTopic = request(app)
             .get("/api/articles?topic=stjfxgntsj")
-            .expect(400);
+            .expect(404);
           const badAuthor = request(app)
             .get("/api/articles?author=gntysthgtrw4r")
-            .expect(400);
+            .expect(404);
           return Promise.all([badTopic, badAuthor]).then(
             ([badTopic, badAuthor]) => {
               expect(badTopic.body.msg).to.equal("Topic doesnt exist.");

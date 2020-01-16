@@ -10,14 +10,7 @@ exports.selectUserByUsername = ({ username }, isQuery) => {
       } else if (user.length !== 0 && isQuery) {
         return [];
       } else {
-        if (isQuery) {
-          return Promise.reject({
-            msg: "User does not exist.",
-            status: 400
-          });
-        } else {
-          return Promise.reject({ msg: "User does not exist.", status: 404 });
-        }
+        return Promise.reject({ msg: "User does not exist.", status: 404 });
       }
     });
 };

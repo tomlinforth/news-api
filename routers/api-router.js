@@ -6,6 +6,11 @@ const { sendUserByUsername } = require("../controllers/c-users");
 const { invalidMethod } = require("../controllers/c-universal");
 
 apiRouter
+  .route("/")
+  .get()
+  .delete(invalidMethod);
+
+apiRouter
   .route("/topics")
   .get(sendTopics)
   .all(invalidMethod);

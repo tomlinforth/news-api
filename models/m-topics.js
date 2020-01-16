@@ -14,14 +14,7 @@ exports.selectTopicBySlug = ({ slug }, isQuery) => {
       } else if (topic.length !== 0 && isQuery) {
         return [];
       } else {
-        if (isQuery) {
-          return Promise.reject({
-            status: 400,
-            msg: "Topic doesnt exist."
-          });
-        } else {
-          return Promise.reject({ status: 404, msg: "Topic doesnt exist." });
-        }
+        return Promise.reject({ status: 404, msg: "Topic doesnt exist." });
       }
     });
 };
