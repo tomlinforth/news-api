@@ -4,10 +4,11 @@ const commentsRouter = require("../routers/comments-router");
 const { sendTopics } = require("../controllers/c-topics");
 const { sendUserByUsername } = require("../controllers/c-users");
 const { invalidMethod } = require("../controllers/c-universal");
+const { sendAllEndpoints } = require("../controllers/c-api");
 
 apiRouter
   .route("/")
-  .get()
+  .get(sendAllEndpoints)
   .delete(invalidMethod);
 
 apiRouter
