@@ -11,7 +11,6 @@ app.get("/*", function notARoute(req, res, next) {
 });
 
 app.use(function psqlErr(err, req, res, next) {
-  // console.log(err);
   if (err.code) {
     const errRef = {
       "22P02": { status: 400, msg: "Invalid data type (integer needed)." },
