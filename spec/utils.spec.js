@@ -3,7 +3,8 @@ const { expect } = require("chai");
 const {
   formatDates,
   makeRefObj,
-  formatComments
+  formatComments,
+  createCommentCountRef
 } = require("../db/utils/utils");
 
 describe("formatDates", () => {
@@ -87,13 +88,25 @@ describe("formatDates", () => {
         votes: 100
       }
     ];
+    const inputCopy = [
+      {
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: 1542284514171,
+        votes: 100
+      }
+    ];
+    formatDates(input);
+    expect(input).to.eql(inputCopy);
     expect(formatDates(input)).to.not.equal(input);
     expect(formatDates(input)[0]).to.not.equal(input[0]);
   });
 });
 
 describe("makeRefObj", () => {
-  it("returns an empty array when passed an empty object", () => {
+  it("returns an empty object when passed an empty array", () => {
     expect(makeRefObj([])).to.eql({});
   });
   it("returns a valid reference object of one article", () => {
@@ -110,6 +123,9 @@ describe("makeRefObj", () => {
   });
   it("doesnt mutate the input array", () => {
     const input = [{ article_id: 1, title: "abc" }];
+    const inputCopy = [{ article_id: 1, title: "abc" }];
+    makeRefObj(input);
+    expect(input).to.eql(inputCopy);
     expect(makeRefObj(input)).to.not.equal(input);
   });
 });
@@ -214,8 +230,46 @@ describe("formatComments", () => {
         created_at: 1511354163389
       }
     ];
+    const inputCopy = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      }
+    ];
     const articleRef = { "They're not exactly dogs, are they?": 15 };
+    formatComments(input, articleRef);
+    expect(input).to.eql(inputCopy);
     expect(formatComments(input, articleRef)).to.not.equal(input);
     expect(formatComments(input, articleRef)[0]).to.not.equal(input[0]);
+  });
+});
+
+describe("createCommentCountRef", () => {
+  it("returns an empty object when passed an empty array", () => {
+    expect(createCommentCountRef([])).to.eql({});
+  });
+  it("returns correct count object when passed one comment", () => {
+    const input = [{ count: "1", article_id: 5 }];
+    expect(createCommentCountRef(input)).to.eql({ 5: 1 });
+  });
+  it("returns correct count object when passed multiple comments", () => {
+    const input = [
+      { count: "2", article_id: 9 },
+      { count: "2", article_id: 5 },
+      { count: "1", article_id: 6 },
+      { count: "13", article_id: 1 }
+    ];
+    expect(createCommentCountRef(input)).to.eql({ 5: 2, 9: 2, 6: 1, 1: 13 });
+  });
+  it("doesnt mutate the input array", () => {
+    const input = [{ count: "1", article_id: 5 }];
+    const inputCopy = [{ count: "1", article_id: 5 }];
+    makeRefObj(input);
+    expect(input).to.eql(inputCopy);
+    expect(makeRefObj(input)).to.not.equal(input);
   });
 });

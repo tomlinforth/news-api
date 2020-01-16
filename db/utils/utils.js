@@ -25,3 +25,23 @@ exports.formatComments = (comments, articleRef) => {
     return commentCopy;
   });
 };
+
+exports.createCommentCountRef = countData => {
+  const countRef = {};
+  countData.forEach(count => {
+    countRef[count.article_id] = Number(count.count);
+  });
+  return countRef;
+};
+
+exports.rejectIfInvalidSortOrOrder = (validKeys, query) => {
+  if (!validKeys.includes(query.sort_by || "created_at")) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid column name in query."
+    });
+  }
+  if (query.order && query.order !== "asc" && query.order !== "desc") {
+    return Promise.reject({ status: 400, msg: "Invalid order query." });
+  }
+};
