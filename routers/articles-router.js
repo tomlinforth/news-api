@@ -10,7 +10,10 @@ const {
 } = require("../controllers/c-comments");
 const { invalidMethod } = require("../controllers/c-universal");
 
-articlesRouter.get("/", sendArticles).all(invalidMethod);
+articlesRouter
+  .route("/")
+  .get(sendArticles)
+  .all(invalidMethod);
 
 articlesRouter
   .route("/:articleID")

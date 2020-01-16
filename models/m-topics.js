@@ -9,8 +9,10 @@ exports.selectTopicBySlug = ({ slug }, isQuery) => {
     .select("*")
     .where("slug", slug)
     .then(topic => {
-      if (topic.length !== 0) {
+      if (topic.length !== 0 && !isQuery) {
         return topic;
+      } else if (topic.length !== 0 && isQuery) {
+        return [];
       } else {
         if (isQuery) {
           return Promise.reject({

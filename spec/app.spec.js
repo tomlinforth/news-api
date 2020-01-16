@@ -533,6 +533,45 @@ describe("/api", () => {
           );
         });
       });
+      describe("UNAVAILABLE METHODS", () => {
+        it("*:405 on / returns invalid method message", () => {
+          const invalidPost = request(app)
+            .post("/api/articles")
+            .expect(405);
+
+          const invalidPatch = request(app)
+            .patch("/api/articles")
+            .expect(405);
+
+          const invalidPut = request(app)
+            .put("/api/articles")
+            .expect(405);
+
+          const invalidDelete = request(app)
+            .delete("/api/articles")
+            .expect(405);
+
+          return Promise.all([
+            invalidDelete,
+            invalidPatch,
+            invalidPost,
+            invalidPut
+          ]).then(([delRes, patchRes, postRes, putRes]) => {
+            expect(delRes.body.msg).to.equal(
+              "Requested method on URL is unavailable."
+            );
+            expect(patchRes.body.msg).to.equal(
+              "Requested method on URL is unavailable."
+            );
+            expect(postRes.body.msg).to.equal(
+              "Requested method on URL is unavailable."
+            );
+            expect(putRes.body.msg).to.equal(
+              "Requested method on URL is unavailable."
+            );
+          });
+        });
+      });
       describe("/:article_id", () => {
         describe("GET", () => {
           it("GET:404 on / when passed a valid article id that doesnt exist in the db", () => {
@@ -617,6 +656,35 @@ describe("/api", () => {
                   "Invalid data type (integer needed)."
                 );
               });
+          });
+        });
+        describe("UNAVAILABLE METHODS", () => {
+          it("*:405 on / returns invalid method message", () => {
+            const invalidPost = request(app)
+              .post("/api/articles/1")
+              .expect(405);
+
+            const invalidPut = request(app)
+              .put("/api/articles/1")
+              .expect(405);
+
+            const invalidDelete = request(app)
+              .delete("/api/articles/1")
+              .expect(405);
+
+            return Promise.all([invalidDelete, invalidPost, invalidPut]).then(
+              ([delRes, postRes, putRes]) => {
+                expect(delRes.body.msg).to.equal(
+                  "Requested method on URL is unavailable."
+                );
+                expect(postRes.body.msg).to.equal(
+                  "Requested method on URL is unavailable."
+                );
+                expect(putRes.body.msg).to.equal(
+                  "Requested method on URL is unavailable."
+                );
+              }
+            );
           });
         });
         describe("/comments", () => {
@@ -714,6 +782,37 @@ describe("/api", () => {
               );
             });
           });
+          describe("UNAVAILABLE METHODS", () => {
+            it("*:405 on / returns invalid method message", () => {
+              const invalidPatch = request(app)
+                .patch("/api/articles/1/comments")
+                .expect(405);
+
+              const invalidPut = request(app)
+                .put("/api/articles/1/comments")
+                .expect(405);
+
+              const invalidDelete = request(app)
+                .delete("/api/articles/1/comments")
+                .expect(405);
+
+              return Promise.all([
+                invalidDelete,
+                invalidPatch,
+                invalidPut
+              ]).then(([delRes, patchRes, putRes]) => {
+                expect(delRes.body.msg).to.equal(
+                  "Requested method on URL is unavailable."
+                );
+                expect(patchRes.body.msg).to.equal(
+                  "Requested method on URL is unavailable."
+                );
+                expect(putRes.body.msg).to.equal(
+                  "Requested method on URL is unavailable."
+                );
+              });
+            });
+          });
         });
       });
     });
@@ -772,16 +871,48 @@ describe("/api", () => {
               });
           });
         });
+        describe("UNAVAILABLE METHODS", () => {
+          it("*:405 on / returns invalid method message", () => {
+            const invalidPost = request(app)
+              .post("/api/comments/1")
+              .expect(405);
+
+            const invalidPut = request(app)
+              .put("/api/comments/1")
+              .expect(405);
+
+            return Promise.all([invalidPost, invalidPut]).then(
+              ([postRes, putRes]) => {
+                expect(postRes.body.msg).to.equal(
+                  "Requested method on URL is unavailable."
+                );
+                expect(putRes.body.msg).to.equal(
+                  "Requested method on URL is unavailable."
+                );
+              }
+            );
+          });
+        });
       });
     });
   });
 
-  it("no extra GET paths", () => {
-    return request(app)
-      .get("/api/articles/1/coments")
-      .expect(404)
-      .then(response => {
-        expect(response.body.msg).to.equal("Requested URL doesnt exist.");
-      });
+  describe("no extra GET paths", () => {
+    it("returns 404 when passed /...(doesnt exist).", () => {
+      return request(app)
+        .get("/api/jhtdfjhgvkjyf")
+        .expect(404)
+        .then(response => {
+          expect(response.body.msg).to.equal("Requested URL doesnt exist.");
+        });
+    });
+    it("returns 404 when passed /api/...(doesnt exist).", () => {
+      return request(app)
+        .get("/api/jhtdfjhgvkjyf")
+        .expect(404)
+        .then(response => {
+          expect(response.body.msg).to.equal("Requested URL doesnt exist.");
+        });
+    });
   });
 });

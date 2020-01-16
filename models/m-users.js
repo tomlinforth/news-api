@@ -5,8 +5,11 @@ exports.selectUserByUsername = ({ username }, isQuery) => {
     .select("*")
     .where("username", username)
     .then(user => {
-      if (user.length !== 0) return user;
-      else {
+      if (user.length !== 0 && !isQuery) {
+        return user;
+      } else if (user.length !== 0 && isQuery) {
+        return [];
+      } else {
         if (isQuery) {
           return Promise.reject({
             msg: "User does not exist.",

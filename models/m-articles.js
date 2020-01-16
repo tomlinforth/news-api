@@ -46,32 +46,22 @@ exports.selectArticles = query => {
       }
     })
     .then(articles => {
-      if (articles.length !== 0) return articles;
-      else {
-        if (query.topic && query.author) {
-          return Promise.all([
-            selectTopicBySlug({ slug: query.topic }, true),
-            selectUserByUsername({ username: query.author }, true)
-          ]).then(([topicCheck, authorCheck]) => {
-            if (topicCheck.length !== 0 || authorCheck.length !== 0) {
-              return [];
-            }
-          });
-        } else if (query.topic) {
-          return selectTopicBySlug({ slug: query.topic }, true).then(topic => {
-            if (topic.length !== 0) {
-              return [];
-            }
-          });
-        } else if (query.author) {
-          return selectUserByUsername({ username: query.author }, true).then(
-            user => {
-              if (user.length !== 0) {
-                return [];
-              }
-            }
-          );
+      if (articles.length !== 0) {
+        return articles;
+      } else {
+        if (query.topic) {
+          return selectTopicBySlug({ slug: query.topic }, true);
         }
+        if (query.author) {
+          return selectUserByUsername({ username: query.author }, true);
+        }
+      }
+    })
+    .then(ambigRes => {
+      if (!ambigRes[0]) {
+        return [];
+      } else {
+        return ambigRes;
       }
     });
 };
