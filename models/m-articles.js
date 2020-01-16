@@ -2,7 +2,6 @@ const connection = require("../db/connection");
 const { rejectIfInvalidSortOrOrder } = require("../db/utils/utils");
 const { selectTopicBySlug } = require("../models/m-topics");
 const { selectUserByUsername } = require("../models/m-users");
-// Code to get numbers from postgres select
 const types = require("pg").types;
 types.setTypeParser(20, val => parseInt(val));
 
