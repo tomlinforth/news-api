@@ -2,6 +2,17 @@
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
+  "GET /api/users/:username": {
+    "description": "serves an object with all information on specified user",
+    "queries": [],
+    "exampleResponse": {
+      "user": {
+        "username": "example_username",
+        "avatar_url": "https://www.example.com/exampleImage.jpg",
+        "name": "exampleForename exampleSurname"
+      }
+    }
+  },
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],
@@ -23,5 +34,96 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an object with all relevant information about specified article",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "author": "tom",
+        "title": "I like dogs.",
+        "body": "Dogs are very cool and fun.",
+        "topic": "dogs",
+        "created_at": "exampleDateTime",
+        "votes": 10,
+        "comment_count": 3
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "increases votes on current article, serves updated article object",
+    "queries": [],
+    "exampleRequest": { "inc_votes": 1 },
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "author": "tom",
+        "title": "I like dogs.",
+        "body": "Dogs are very cool and fun.",
+        "topic": "dogs",
+        "created_at": "exampleDateTime",
+        "votes": "increasedVotes",
+        "comment_count": 3
+      }
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "adds new comment to database, serves new comment object",
+    "queries": [],
+    "exampleRequest": { "username": "luke", "body": "I like dogs too!" },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 15,
+        "author": "luke",
+        "article_id": "specified id from path",
+        "votes": 0,
+        "created_at": "exampleDateTime",
+        "body": "I like dogs too!"
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of all comments on specified article",
+    "queries": ["sort_by", "order"],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 15,
+          "author": "luke",
+          "article_id": "specified id from path",
+          "votes": 0,
+          "created_at": "exampleDateTime",
+          "body": "I like dogs too!"
+        },
+        {
+          "comment_id": 12,
+          "author": "joolzie",
+          "article_id": "specified id from path",
+          "votes": 2,
+          "created_at": "exampleDateTime",
+          "body": "paper is dry"
+        }
+      ]
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "increases votes on specified comment, serves updated comment object",
+    "queries": [],
+    "exampleRequest": { "inc_votes": 10 },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 15,
+        "author": "luke",
+        "article_id": "specified id from path",
+        "votes": 10,
+        "created_at": "exampleDateTime",
+        "body": "I like dogs too!"
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes comment from database, serves no response.",
+    "queries": []
   }
 }
