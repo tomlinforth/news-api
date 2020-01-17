@@ -7,6 +7,7 @@ const { expect } = chai;
 chai.should();
 chai.use(require("chai-sorted"));
 chai.use(require("chai-things"));
+const endpointData = require("../endpoints.json");
 
 describe("/api", () => {
   beforeEach(() => {
@@ -17,6 +18,16 @@ describe("/api", () => {
   });
 
   describe("'Happy' tests", () => {
+    describe("GET", () => {
+      it("GET:200, sends endpoints json file", () => {
+        return request(app)
+          .get("/api")
+          .expect(200)
+          .then(response => {
+            expect(response.body).to.eql(endpointData);
+          });
+      });
+    });
     describe("/topics", () => {
       describe("GET", () => {
         it("GET:200 returns array of topics", () => {
