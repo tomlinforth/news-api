@@ -217,7 +217,7 @@ describe("/api", () => {
             }
           );
         });
-        it("GET:200 on / when passed not an integer into the page query, sets to default", () => {
+        it.only("GET:200 on / when passed not an integer into the page query, sets to default", () => {
           return request(app)
             .get("/api/articles?p=a")
             .expect(200)
@@ -361,6 +361,21 @@ describe("/api", () => {
               })
               .then(response => {
                 expect(response.body.article.votes).to.equal(101);
+              });
+          });
+        });
+        describe("DELETE", () => {
+          it("DELETE:204 on / deletes article from database, returns nothing", () => {
+            return request(app)
+              .delete("/api/articles/1")
+              .expect(204)
+              .then(() => {
+                return request(app)
+                  .get("/api/articles/1")
+                  .expect(404)
+                  .then(response => {
+                    expect(response.body.msg).to.equal("Article doesnt exist.");
+                  });
               });
           });
         });
@@ -743,10 +758,6 @@ describe("/api", () => {
       });
       describe("UNAVAILABLE METHODS", () => {
         it("*:405 on / returns invalid method message", () => {
-          const invalidPost = request(app)
-            .post("/api/articles")
-            .expect(405);
-
           const invalidPatch = request(app)
             .patch("/api/articles")
             .expect(405);
@@ -759,25 +770,19 @@ describe("/api", () => {
             .delete("/api/articles")
             .expect(405);
 
-          return Promise.all([
-            invalidDelete,
-            invalidPatch,
-            invalidPost,
-            invalidPut
-          ]).then(([delRes, patchRes, postRes, putRes]) => {
-            expect(delRes.body.msg).to.equal(
-              "Requested method on URL is unavailable."
-            );
-            expect(patchRes.body.msg).to.equal(
-              "Requested method on URL is unavailable."
-            );
-            expect(postRes.body.msg).to.equal(
-              "Requested method on URL is unavailable."
-            );
-            expect(putRes.body.msg).to.equal(
-              "Requested method on URL is unavailable."
-            );
-          });
+          return Promise.all([invalidDelete, invalidPatch, invalidPut]).then(
+            ([delRes, patchRes, putRes]) => {
+              expect(delRes.body.msg).to.equal(
+                "Requested method on URL is unavailable."
+              );
+              expect(patchRes.body.msg).to.equal(
+                "Requested method on URL is unavailable."
+              );
+              expect(putRes.body.msg).to.equal(
+                "Requested method on URL is unavailable."
+              );
+            }
+          );
         });
       });
       describe("/:article_id", () => {
@@ -866,6 +871,26 @@ describe("/api", () => {
               });
           });
         });
+        describe("DELETE", () => {
+          it("DELETE:404 on / when passed valid id that doesnt exist", () => {
+            return request(app)
+              .delete("/api/articles/235434")
+              .expect(404)
+              .then(response => {
+                expect(response.body.msg).to.equal("Article doesnt exist.");
+              });
+          });
+          it("DELETE:400 on / when passed an invalid id data type", () => {
+            return request(app)
+              .delete("/api/articles/12re")
+              .expect(400)
+              .then(response => {
+                expect(response.body.msg).to.equal(
+                  "Invalid data type (integer needed)."
+                );
+              });
+          });
+        });
         describe("UNAVAILABLE METHODS", () => {
           it("*:405 on / returns invalid method message", () => {
             const invalidPost = request(app)
@@ -876,15 +901,8 @@ describe("/api", () => {
               .put("/api/articles/1")
               .expect(405);
 
-            const invalidDelete = request(app)
-              .delete("/api/articles/1")
-              .expect(405);
-
-            return Promise.all([invalidDelete, invalidPost, invalidPut]).then(
-              ([delRes, postRes, putRes]) => {
-                expect(delRes.body.msg).to.equal(
-                  "Requested method on URL is unavailable."
-                );
+            return Promise.all([invalidPost, invalidPut]).then(
+              ([postRes, putRes]) => {
                 expect(postRes.body.msg).to.equal(
                   "Requested method on URL is unavailable."
                 );

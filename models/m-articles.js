@@ -32,6 +32,7 @@ exports.selectArticles = query => {
   }
   const letterReg = /\D/g;
   if (letterReg.test(query.limit)) query.limit = 10;
+  if (letterReg.test(query.p)) query.p = 1;
   return connection("articles")
     .leftJoin("comments", "articles.article_id", "=", "comments.article_id")
     .count("comment_id as comment_count")
@@ -46,16 +47,13 @@ exports.selectArticles = query => {
     .groupBy("articles.article_id")
     .orderBy(query.sort_by || "created_at", query.order || "desc")
     .limit(query.limit || 10)
+    .offset((query.p - 1) * (query.limit || 10) || 0)
     .modify(currentQuery => {
       if (query.topic) {
         currentQuery.where("topic", query.topic);
       }
       if (query.author) {
         currentQuery.where("articles.author", query.author);
-      }
-      if (query.p) {
-        if (letterReg.test(query.p)) query.p = 1;
-        currentQuery.offset((query.p - 1) * (query.limit || 10));
       }
     })
     .then(articles => {
@@ -124,4 +122,14 @@ exports.insertNewArticle = ({ username, topic, title, body }) => {
   return connection("articles")
     .insert(articleToInsert)
     .returning("*");
+};
+
+exports.deleteArticleById = ({ articleID }) => {
+  return connection("articles")
+    .where("article_id", articleID)
+    .del()
+    .then(rowCount => {
+      if (rowCount !== 0) return rowCount;
+      else return this.selectArticleById({ articleID });
+    });
 };

@@ -3,7 +3,8 @@ const {
   sendArticles,
   sendArticleById,
   updateArticleById,
-  addNewArticle
+  addNewArticle,
+  removeArticleById
 } = require("../controllers/c-articles");
 const {
   sendCommentsByArticleId,
@@ -21,6 +22,7 @@ articlesRouter
   .route("/:articleID")
   .get(sendArticleById)
   .patch(updateArticleById)
+  .delete(removeArticleById)
   .all(invalidMethod);
 
 articlesRouter

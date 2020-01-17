@@ -2,7 +2,8 @@ const {
   selectArticles,
   selectArticleById,
   patchArticleById,
-  insertNewArticle
+  insertNewArticle,
+  deleteArticleById
 } = require("../models/m-articles");
 
 exports.sendArticles = (req, res, next) => {
@@ -33,6 +34,14 @@ exports.addNewArticle = (req, res, next) => {
   insertNewArticle(req.body)
     .then(([article]) => {
       res.status(201).send({ article });
+    })
+    .catch(next);
+};
+
+exports.removeArticleById = (req, res, next) => {
+  deleteArticleById(req.params)
+    .then(rowCount => {
+      res.sendStatus(204);
     })
     .catch(next);
 };

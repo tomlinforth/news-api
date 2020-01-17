@@ -87,6 +87,10 @@
       }
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes the specified article from the database, serves up nothing",
+    "queries": []
+  },
   "POST /api/articles/:article_id/comments": {
     "description": "adds new comment to database, serves new comment object",
     "queries": [],
