@@ -14,7 +14,14 @@ exports.selectArticles = query => {
     "author",
     "created_at"
   ];
-  const queryKeyRef = { sort_by: true, order: true, topic: true, author: true };
+  const queryKeyRef = {
+    sort_by: true,
+    order: true,
+    topic: true,
+    author: true,
+    limit: true,
+    p: true
+  };
   const orderSortCheck = rejectIfInvalidSortOrOrder(validSortByKeys, query);
   if (orderSortCheck) return orderSortCheck;
 
@@ -23,6 +30,8 @@ exports.selectArticles = query => {
       return Promise.reject({ status: 400, msg: "Invalid query parameter." });
     }
   }
+  const letterReg = /\D/g;
+  if (letterReg.test(query.limit)) query.limit = 10;
   return connection("articles")
     .leftJoin("comments", "articles.article_id", "=", "comments.article_id")
     .count("comment_id as comment_count")
@@ -36,12 +45,17 @@ exports.selectArticles = query => {
     )
     .groupBy("articles.article_id")
     .orderBy(query.sort_by || "created_at", query.order || "desc")
+    .limit(query.limit || 10)
     .modify(currentQuery => {
       if (query.topic) {
         currentQuery.where("topic", query.topic);
       }
       if (query.author) {
         currentQuery.where("articles.author", query.author);
+      }
+      if (query.p) {
+        if (letterReg.test(query.p)) query.p = 1;
+        currentQuery.offset((query.p - 1) * (query.limit || 10));
       }
     })
     .then(articles => {

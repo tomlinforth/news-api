@@ -64,7 +64,7 @@ describe("/api", () => {
     });
     describe("/articles", () => {
       describe("GET", () => {
-        it("GET:200 returns array of articles, with a comment count", () => {
+        it("GET:200 returns array of articles, with a comment count on each article and an overall article count", () => {
           return request(app)
             .get("/api/articles")
             .expect(200)
@@ -90,6 +90,7 @@ describe("/api", () => {
                 created_at: "2018-11-15T12:21:54.171Z",
                 comment_count: 13
               });
+              expect(response.body.total_count).to.equal(10);
             });
         });
         it("GET:200 on / when passed no query defaults to sort by created_at, order desc", () => {
@@ -174,6 +175,55 @@ describe("/api", () => {
             .expect(200)
             .then(response => {
               expect(response.body.articles).to.eql([]);
+            });
+        });
+        it("GET:200 on / when passed a limit query, returning specified amount of articles, defaulting to 10", () => {
+          const defaultCheck = request(app)
+            .get("/api/articles")
+            .expect(200);
+          const limitCheck = request(app)
+            .get("/api/articles?limit=5")
+            .expect(200);
+          return Promise.all([defaultCheck, limitCheck]).then(
+            ([defaultCheck, limitCheck]) => {
+              expect(defaultCheck.body.articles).to.have.length(10);
+              expect(defaultCheck.body.total_count).to.equal(10);
+              expect(limitCheck.body.articles).to.have.length(5);
+              expect(limitCheck.body.total_count).to.equal(5);
+            }
+          );
+        });
+        it("GET:200 on / when passed not an integer into the limit query, sets to default", () => {
+          return request(app)
+            .get("/api/articles?limit=a")
+            .expect(200)
+            .then(response => {
+              expect(response.body.total_count).to.equal(10);
+            });
+        });
+        it("GET:200 on / when passed a page query, returning correct page based on limit", () => {
+          const defaultLimitPage = request(app)
+            .get("/api/articles?p=2")
+            .expect(200);
+          const customLimitPage = request(app)
+            .get("/api/articles?limit=4&p=3")
+            .expect(200);
+          return Promise.all([defaultLimitPage, customLimitPage]).then(
+            ([defLimRes, cusLimRes]) => {
+              expect(defLimRes.body.total_count).to.equal(2);
+              expect(defLimRes.body.articles[0]).to.contain({ article_id: 11 });
+              expect(cusLimRes.body.total_count).to.equal(4);
+              expect(cusLimRes.body.articles[0]).to.contain({ article_id: 9 });
+            }
+          );
+        });
+        it("GET:200 on / when passed not an integer into the page query, sets to default", () => {
+          return request(app)
+            .get("/api/articles?p=a")
+            .expect(200)
+            .then(response => {
+              expect(response.body.total_count).to.equal(10);
+              expect(response.body.articles[0]).to.contain({ article_id: 1 });
             });
         });
       });

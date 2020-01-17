@@ -7,7 +7,7 @@ const {
 exports.sendArticles = (req, res, next) => {
   selectArticles(req.query)
     .then(articles => {
-      res.status(200).send({ articles });
+      res.status(200).send({ articles, total_count: articles.length });
     })
     .catch(next);
 };
