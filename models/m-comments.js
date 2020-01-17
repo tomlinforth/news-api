@@ -7,11 +7,15 @@ exports.selectCommentsByArticleId = ({ articleID }, query) => {
   const orderSortCheck = rejectIfInvalidSortOrOrder(commentKeys, query);
   if (orderSortCheck) return orderSortCheck;
 
+  if (/\D/g.test(query.limit)) query.limit = 10;
+  if (/\D/g.test(query.p)) query.p = 1;
   const articleCheck = selectArticleById({ articleID });
   const commentData = connection("comments")
     .select(...commentKeys)
     .where("article_id", articleID)
-    .orderBy(query.sort_by || "created_at", query.order || "desc");
+    .orderBy(query.sort_by || "created_at", query.order || "desc")
+    .limit(query.limit || 10)
+    .offset((query.p - 1) * (query.limit || 10) || 0);
   return Promise.all([articleCheck, commentData]).then(
     ([articleCheck, commentData]) => {
       if (commentData.length !== 0) return commentData;

@@ -387,6 +387,50 @@ describe("/api", () => {
                   expect(response.body.comments).to.eql([]);
                 });
             });
+            it("GET:200 on / when passed a limit query, returning specified amount of articles, defaulting to 10", () => {
+              const defaultCheck = request(app)
+                .get("/api/articles/1/comments")
+                .expect(200);
+              const limitCheck = request(app)
+                .get("/api/articles/1/comments?limit=5")
+                .expect(200);
+              return Promise.all([defaultCheck, limitCheck]).then(
+                ([defaultCheck, limitCheck]) => {
+                  expect(defaultCheck.body.comments).to.have.length(10);
+                  expect(limitCheck.body.comments).to.have.length(5);
+                }
+              );
+            });
+            it("GET:200 on / when passed not an integer into the limit query, sets to default", () => {
+              return request(app)
+                .get("/api/articles/1/comments?limit=a")
+                .expect(200)
+                .then(response => {
+                  expect(response.body.comments).to.have.length(10);
+                });
+            });
+            it("GET:200 on / when passed a page query, returning correct page based on limit", () => {
+              const defaultLimitPage = request(app)
+                .get("/api/articles/1/comments?p=2")
+                .expect(200);
+              const customLimitPage = request(app)
+                .get("/api/articles/1/comments?limit=4&p=3")
+                .expect(200);
+              return Promise.all([defaultLimitPage, customLimitPage]).then(
+                ([defLimRes, cusLimRes]) => {
+                  expect(defLimRes.body.comments).to.have.length(3);
+                  expect(cusLimRes.body.comments).to.have.length(4);
+                }
+              );
+            });
+            it("GET:200 on / when passed not an integer into the page query, sets to default", () => {
+              return request(app)
+                .get("/api/articles/1/comments?p=a")
+                .expect(200)
+                .then(response => {
+                  expect(response.body.comments).to.have.length(10);
+                });
+            });
           });
           describe("POST", () => {
             it("POST:201 on / adds new comment, returns new comment data", () => {
