@@ -217,7 +217,7 @@ describe("/api", () => {
             }
           );
         });
-        it.only("GET:200 on / when passed not an integer into the page query, sets to default", () => {
+        it("GET:200 on / when passed not an integer into the page query, sets to default", () => {
           return request(app)
             .get("/api/articles?p=a")
             .expect(200)
