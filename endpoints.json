@@ -35,6 +35,25 @@
       ]
     }
   },
+  "POST /api/articles": {
+    "description": "adds new article to the database, serves new article after its been added",
+    "queries": [],
+    "exampleRequest": {
+      "username": "example_username",
+      "title": "example title",
+      "topic": "example topic",
+      "body": "example article"
+    },
+    "exampleResponse": {
+      "article_id": 10,
+      "username": "example_username",
+      "title": "example title",
+      "topic": "example topic",
+      "body": "example article",
+      "votes": 0,
+      "created_at": "exampleDateTime"
+    }
+  },
   "GET /api/articles/:article_id": {
     "description": "serves an object with all relevant information about specified article",
     "queries": [],

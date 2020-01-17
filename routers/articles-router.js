@@ -2,7 +2,8 @@ const articlesRouter = require("express").Router();
 const {
   sendArticles,
   sendArticleById,
-  updateArticleById
+  updateArticleById,
+  addNewArticle
 } = require("../controllers/c-articles");
 const {
   sendCommentsByArticleId,
@@ -13,6 +14,7 @@ const { invalidMethod } = require("../controllers/c-universal");
 articlesRouter
   .route("/")
   .get(sendArticles)
+  .post(addNewArticle)
   .all(invalidMethod);
 
 articlesRouter

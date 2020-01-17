@@ -227,6 +227,57 @@ describe("/api", () => {
             });
         });
       });
+      describe("POST", () => {
+        it("POST:201 on / adds new article, returns new article object", () => {
+          return request(app)
+            .post("/api/articles")
+            .send({
+              title: "Test article",
+              topic: "cats",
+              body: "This is a test article.",
+              username: "rogersop"
+            })
+            .expect(201)
+            .then(response => {
+              expect(response.body.article).to.have.keys(
+                "article_id",
+                "title",
+                "author",
+                "topic",
+                "body",
+                "votes",
+                "created_at"
+              );
+              expect(response.body.article).to.contain({
+                title: "Test article",
+                topic: "cats",
+                body: "This is a test article.",
+                author: "rogersop"
+              });
+            });
+        });
+        it("POST:201 on / ignores extra data in the body", () => {
+          return request(app)
+            .post("/api/articles")
+            .send({
+              title: "Test article",
+              topic: "cats",
+              body: "This is a test article.",
+              username: "rogersop",
+              article_id: 1
+            })
+            .expect(201)
+            .then(response => {
+              expect(response.body.article).to.contain({
+                title: "Test article",
+                topic: "cats",
+                body: "This is a test article.",
+                author: "rogersop"
+              });
+              expect(response.body.article).to.not.contain({ article_id: 1 });
+            });
+        });
+      });
       describe("/:article_id", () => {
         describe("GET", () => {
           it("GET:200 on / returns object containing all data of that article", () => {
@@ -636,6 +687,58 @@ describe("/api", () => {
               expect(badAuthor.body.msg).to.equal("User does not exist.");
             }
           );
+        });
+      });
+      describe("POST", () => {
+        it("POST:400 on / when passed missing data in body", () => {
+          const missingUsername = request(app)
+            .post("/api/articles")
+            .send({
+              title: "Test article",
+              topic: "cats",
+              body: "This is a test article."
+            })
+            .expect(400);
+
+          const missingBody = request(app)
+            .post("/api/articles")
+            .send({
+              title: "Test article",
+              topic: "cats",
+              username: "rogersop"
+            })
+            .expect(400);
+
+          const missingTitle = request(app)
+            .post("/api/articles")
+            .send({
+              body: "Test article",
+              topic: "cats",
+              username: "rogersop"
+            })
+            .expect(400);
+
+          const missingTopic = request(app)
+            .post("/api/articles")
+            .send({
+              title: "Test article",
+              body: "cats",
+              username: "rogersop"
+            })
+            .expect(400);
+
+          return Promise.all([
+            missingUsername,
+            missingBody,
+            missingTitle,
+            missingTopic
+          ]).then(missingResponses => {
+            expect(
+              missingResponses.every(
+                response => response.body.msg === "Missing data in request."
+              )
+            ).to.be.true;
+          });
         });
       });
       describe("UNAVAILABLE METHODS", () => {

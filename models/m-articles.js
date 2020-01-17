@@ -118,3 +118,10 @@ exports.patchArticleById = ({ articleID }, { inc_votes }) => {
     });
   }
 };
+
+exports.insertNewArticle = ({ username, topic, title, body }) => {
+  const articleToInsert = { topic, title, body, author: username };
+  return connection("articles")
+    .insert(articleToInsert)
+    .returning("*");
+};
