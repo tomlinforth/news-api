@@ -13,7 +13,8 @@ exports.selectArticles = query => {
     "topic",
     "author",
     "created_at",
-    "comment_count"
+    "comment_count",
+    "votes"
   ];
   const queryKeyRef = {
     sort_by: true,
@@ -21,8 +22,7 @@ exports.selectArticles = query => {
     topic: true,
     author: true,
     limit: true,
-    p: true,
-    comment_count: true
+    p: true
   };
   const orderSortCheck = rejectIfInvalidSortOrOrder(validSortByKeys, query);
   if (orderSortCheck) return orderSortCheck;
