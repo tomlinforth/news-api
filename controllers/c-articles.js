@@ -8,7 +8,7 @@ const {
 } = require("../models/m-articles");
 
 exports.sendArticles = (req, res, next) => {
-  const total_articles = selectAllArticles();
+  const total_articles = selectAllArticles(req.query);
   const actReq = selectArticles(req.query);
   Promise.all([total_articles, actReq])
     .then(([total_articles, actReq]) => {

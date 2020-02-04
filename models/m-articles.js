@@ -137,7 +137,31 @@ exports.deleteArticleById = ({ articleID }) => {
     });
 };
 
-exports.selectAllArticles = () => {
+exports.selectAllArticles = query => {
+  const validSortByKeys = [
+    "article_id",
+    "title",
+    "votes",
+    "topic",
+    "author",
+    "created_at"
+  ];
+  const queryKeyRef = {
+    sort_by: true,
+    order: true,
+    topic: true,
+    author: true,
+    limit: true,
+    p: true
+  };
+  const orderSortCheck = rejectIfInvalidSortOrOrder(validSortByKeys, query);
+  if (orderSortCheck) return orderSortCheck;
+
+  for (let key in query) {
+    if (!queryKeyRef[key]) {
+      return Promise.reject({ status: 400, msg: "Invalid query parameter." });
+    }
+  }
   return connection("articles")
     .leftJoin("comments", "articles.article_id", "=", "comments.article_id")
     .count("comment_id as comment_count")
@@ -149,5 +173,33 @@ exports.selectAllArticles = () => {
       "articles.author",
       "articles.created_at"
     )
-    .groupBy("articles.article_id");
+    .groupBy("articles.article_id")
+    .orderBy(query.sort_by || "created_at", query.order || "desc")
+    .modify(currentQuery => {
+      if (query.topic) {
+        currentQuery.where("topic", query.topic);
+      }
+      if (query.author) {
+        currentQuery.where("articles.author", query.author);
+      }
+    })
+    .then(articles => {
+      if (articles.length !== 0) {
+        return articles;
+      } else {
+        if (query.topic) {
+          return selectTopicBySlug({ slug: query.topic }, true);
+        }
+        if (query.author) {
+          return selectUserByUsername({ username: query.author }, true);
+        }
+      }
+    })
+    .then(ambigRes => {
+      if (!ambigRes[0]) {
+        return [];
+      } else {
+        return ambigRes;
+      }
+    });
 };
