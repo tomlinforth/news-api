@@ -146,7 +146,9 @@ exports.selectAllArticles = query => {
     "votes",
     "topic",
     "author",
-    "created_at"
+    "created_at",
+    "comment_count",
+    "votes"
   ];
   const queryKeyRef = {
     sort_by: true,
