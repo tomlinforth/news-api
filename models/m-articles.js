@@ -66,6 +66,9 @@ exports.selectArticles = query => {
         if (query.author) {
           return selectUserByUsername({ username: query.author }, true);
         }
+        if (query.p) {
+          return Promise.reject({ status: 404, msg: "No more pages." });
+        }
       }
     })
     .then(ambigRes => {
@@ -132,4 +135,19 @@ exports.deleteArticleById = ({ articleID }) => {
       if (rowCount !== 0) return rowCount;
       else return this.selectArticleById({ articleID });
     });
+};
+
+exports.selectAllArticles = () => {
+  return connection("articles")
+    .leftJoin("comments", "articles.article_id", "=", "comments.article_id")
+    .count("comment_id as comment_count")
+    .select(
+      "articles.article_id",
+      "title",
+      "articles.votes",
+      "topic",
+      "articles.author",
+      "articles.created_at"
+    )
+    .groupBy("articles.article_id");
 };

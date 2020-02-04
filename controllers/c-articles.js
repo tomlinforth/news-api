@@ -1,5 +1,6 @@
 const {
   selectArticles,
+  selectAllArticles,
   selectArticleById,
   patchArticleById,
   insertNewArticle,
@@ -7,9 +8,13 @@ const {
 } = require("../models/m-articles");
 
 exports.sendArticles = (req, res, next) => {
-  selectArticles(req.query)
-    .then(articles => {
-      res.status(200).send({ articles, total_count: articles.length });
+  const total_articles = selectAllArticles();
+  const actReq = selectArticles(req.query);
+  Promise.all([total_articles, actReq])
+    .then(([total_articles, actReq]) => {
+      res
+        .status(200)
+        .send({ articles: actReq, total_count: total_articles.length });
     })
     .catch(next);
 };

@@ -90,7 +90,7 @@ describe("/api", () => {
                 created_at: "2018-11-15T12:21:54.171Z",
                 comment_count: 13
               });
-              expect(response.body.total_count).to.equal(10);
+              expect(response.body.total_count).to.equal(12);
             });
         });
         it("GET:200 on / when passed no query defaults to sort by created_at, order desc", () => {
@@ -187,9 +187,7 @@ describe("/api", () => {
           return Promise.all([defaultCheck, limitCheck]).then(
             ([defaultCheck, limitCheck]) => {
               expect(defaultCheck.body.articles).to.have.length(10);
-              expect(defaultCheck.body.total_count).to.equal(10);
               expect(limitCheck.body.articles).to.have.length(5);
-              expect(limitCheck.body.total_count).to.equal(5);
             }
           );
         });
@@ -198,7 +196,7 @@ describe("/api", () => {
             .get("/api/articles?limit=a")
             .expect(200)
             .then(response => {
-              expect(response.body.total_count).to.equal(10);
+              expect(response.body.articles.length).to.equal(10);
             });
         });
         it("GET:200 on / when passed a page query, returning correct page based on limit", () => {
@@ -210,9 +208,9 @@ describe("/api", () => {
             .expect(200);
           return Promise.all([defaultLimitPage, customLimitPage]).then(
             ([defLimRes, cusLimRes]) => {
-              expect(defLimRes.body.total_count).to.equal(2);
+              expect(defLimRes.body.articles.length).to.equal(2);
               expect(defLimRes.body.articles[0]).to.contain({ article_id: 11 });
-              expect(cusLimRes.body.total_count).to.equal(4);
+              expect(cusLimRes.body.articles.length).to.equal(4);
               expect(cusLimRes.body.articles[0]).to.contain({ article_id: 9 });
             }
           );
@@ -222,7 +220,7 @@ describe("/api", () => {
             .get("/api/articles?p=a")
             .expect(200)
             .then(response => {
-              expect(response.body.total_count).to.equal(10);
+              expect(response.body.articles.length).to.equal(10);
               expect(response.body.articles[0]).to.contain({ article_id: 1 });
             });
         });
@@ -702,6 +700,14 @@ describe("/api", () => {
               expect(badAuthor.body.msg).to.equal("User does not exist.");
             }
           );
+        });
+        it("GET:404 on / when passed a page query that goes past total amount of articles", () => {
+          return request(app)
+            .get("/api/articles?p=20")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("No more pages.");
+            });
         });
       });
       describe("POST", () => {
