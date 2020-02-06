@@ -1,4 +1,4 @@
-const { selectUserByUsername } = require("../models/m-users");
+const { selectUserByUsername, selectUsers } = require("../models/m-users");
 
 exports.sendUserByUsername = (req, res, next) => {
   selectUserByUsername(req.params)
@@ -6,4 +6,13 @@ exports.sendUserByUsername = (req, res, next) => {
       res.status(200).send({ user });
     })
     .catch(next);
+};
+
+exports.sendUsers = (req, res, next) => {
+  selectUsers().then(users => {
+    res
+      .status(200)
+      .send({ users })
+      .catch(next);
+  });
 };

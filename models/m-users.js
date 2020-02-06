@@ -24,3 +24,7 @@ exports.checkUserByUsername = ({ username }) => {
       else return Promise.reject({ msg: "User does not exist.", status: 400 });
     });
 };
+
+exports.selectUsers = () => {
+  return connection("users").select("*");
+};
